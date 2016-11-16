@@ -1,0 +1,139 @@
+{
+    "docs": [
+        {
+            "location": "/", 
+            "text": "Welcome to MySQL Time Machine\n\n\nMySQL Time Machine is a collection of services and tools for creating, processing and storing streams of MySQL data changes. Its main components are listed bellow.\n\n\nReplicator\n\n\nReplicates data changes from MySQL binlog to HBase or Kafka. In case of HBase it preserves the previous data versions. HBase version is intended for auditing of historical data. In addition can maintain special daily-changes tables which are convenient for fast and cheap imports from HBase to Hive. Kafka version is intended for processing data change streams in real time.\n\n\nBinlog Flusher\n\n\nFlushes MySQL database tables to the binlog in order to have the initial snapshot of the database in the binlog.\n\n\nHBase Snapshotter\n\n\nHBaseSnapshotter is a Spark application that takes a snapshot of a HBase table at a given point in time and stores it to a Hive table.Usually you can export from HBase to Hive but you can only get the latest version, as Hive doesn't have enough flexibility to access different versions of an HBase table. Spark framework allows this flexibility since it has the ability and the API to access and manipulate both HBase and Hive.\n\n\nValidator\n\n\nValidates the replicator correctness.", 
+            "title": "Home"
+        }, 
+        {
+            "location": "/#welcome-to-mysql-time-machine", 
+            "text": "MySQL Time Machine is a collection of services and tools for creating, processing and storing streams of MySQL data changes. Its main components are listed bellow.", 
+            "title": "Welcome to MySQL Time Machine"
+        }, 
+        {
+            "location": "/#replicator", 
+            "text": "Replicates data changes from MySQL binlog to HBase or Kafka. In case of HBase it preserves the previous data versions. HBase version is intended for auditing of historical data. In addition can maintain special daily-changes tables which are convenient for fast and cheap imports from HBase to Hive. Kafka version is intended for processing data change streams in real time.", 
+            "title": "Replicator"
+        }, 
+        {
+            "location": "/#binlog-flusher", 
+            "text": "Flushes MySQL database tables to the binlog in order to have the initial snapshot of the database in the binlog.", 
+            "title": "Binlog Flusher"
+        }, 
+        {
+            "location": "/#hbase-snapshotter", 
+            "text": "HBaseSnapshotter is a Spark application that takes a snapshot of a HBase table at a given point in time and stores it to a Hive table.Usually you can export from HBase to Hive but you can only get the latest version, as Hive doesn't have enough flexibility to access different versions of an HBase table. Spark framework allows this flexibility since it has the ability and the API to access and manipulate both HBase and Hive.", 
+            "title": "HBase Snapshotter"
+        }, 
+        {
+            "location": "/#validator", 
+            "text": "Validates the replicator correctness.", 
+            "title": "Validator"
+        }, 
+        {
+            "location": "/user-guide/replicator/", 
+            "text": "Replicator\n\n\nReplicate initial binlog snapshot to HBase\n\n\njava -jar hbrepl-0.13.2.jar \\\n    --hbase-namespace $hbase-namespace \\\n    --applier hbase --schema $schema \\\n    --binlog-filename $first-binlog-filename \\\n    --config-path $config-path \\\n    --initial-snapshot\n\n\n\n\nReplication to HBase after initial snapshot\n\n\njava -jar hbrepl-0.13.2.jar \\\n    --hbase-namespace $hbase-namespace \\\n    --applier hbase \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --config-path $config-path  \\\n    [--delta]\n\n\n\n\nReplication to Kafka\n\n\njava -jar hbrepl-0.13.2.jar \\\n    --applier kafka \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --config-path $config-path\n\n\n\n\nReplicate range of binlog files and output db events as JSON to STDOUT\n\n\njava -jar hbrepl-0.13.2.jar \\\n    --applier STDOUT \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --last-binlog-filename $last-binlog-filename-to-process \\\n    --config-path $config-path\n\n\n\n\nConfiguration file structure\n\n\nreplication_schema:\n    name:      'replicated_schema_name'\n    username:  'user'\n    password:  'pass'\n    host_pool: ['localhost']\nmetadata_store:\n    username: 'user'\n    password: 'pass'\n    host:     'active_schema_host'\n    database: 'active_schema_database'\n    # The following are options for storing replicator metadata,\n    # only one should be used (zookeeper or file)\n    zookeeper:\n        quorum: ['zk-host1', 'zk-host2']\n        path: '/path/in/zookeeper'\n    file:\n        path: '/path/on/disk'\nhbase:\n    namespace: 'schema_namespace'\n    zookeeper_quorum:  ['hbase-zk1-host', 'hbase-zkN-host']\n    hive_imports:\n        tables: ['sometable']\nmysql_failover:\n    pgtid:\n        p_gtid_pattern: $regex_pattern_to_extract_pgtid\n        p_gtid_prefix: $prefix_to_add_to_pgtid_query_used_in_orchestrator_url\n    orchestrator:\n        username: orchestrator-user-name\n        password: orchestrator-password\n        url:      http://orchestrator-host/api\nmetrics:\n    frequency: 10 seconds\n    reporters:\n    # The following are options for metrics reporters,\n    # only one should be used (graphite or console)\n        graphite:\n            namespace: 'graphite.namespace.prefix'\n            url: 'graphite_host[:\ngraphite_port (default is 3002)\n]'\n        console:\n            timeZone: UTC\n            output: stdout", 
+            "title": "Replicator"
+        }, 
+        {
+            "location": "/user-guide/replicator/#replicator", 
+            "text": "", 
+            "title": "Replicator"
+        }, 
+        {
+            "location": "/user-guide/replicator/#replicate-initial-binlog-snapshot-to-hbase", 
+            "text": "java -jar hbrepl-0.13.2.jar \\\n    --hbase-namespace $hbase-namespace \\\n    --applier hbase --schema $schema \\\n    --binlog-filename $first-binlog-filename \\\n    --config-path $config-path \\\n    --initial-snapshot", 
+            "title": "Replicate initial binlog snapshot to HBase"
+        }, 
+        {
+            "location": "/user-guide/replicator/#replication-to-hbase-after-initial-snapshot", 
+            "text": "java -jar hbrepl-0.13.2.jar \\\n    --hbase-namespace $hbase-namespace \\\n    --applier hbase \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --config-path $config-path  \\\n    [--delta]", 
+            "title": "Replication to HBase after initial snapshot"
+        }, 
+        {
+            "location": "/user-guide/replicator/#replication-to-kafka", 
+            "text": "java -jar hbrepl-0.13.2.jar \\\n    --applier kafka \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --config-path $config-path", 
+            "title": "Replication to Kafka"
+        }, 
+        {
+            "location": "/user-guide/replicator/#replicate-range-of-binlog-files-and-output-db-events-as-json-to-stdout", 
+            "text": "java -jar hbrepl-0.13.2.jar \\\n    --applier STDOUT \\\n    --schema $schema \\\n    --binlog-filename $binlog-filename \\\n    --last-binlog-filename $last-binlog-filename-to-process \\\n    --config-path $config-path", 
+            "title": "Replicate range of binlog files and output db events as JSON to STDOUT"
+        }, 
+        {
+            "location": "/user-guide/replicator/#configuration-file-structure", 
+            "text": "replication_schema:\n    name:      'replicated_schema_name'\n    username:  'user'\n    password:  'pass'\n    host_pool: ['localhost']\nmetadata_store:\n    username: 'user'\n    password: 'pass'\n    host:     'active_schema_host'\n    database: 'active_schema_database'\n    # The following are options for storing replicator metadata,\n    # only one should be used (zookeeper or file)\n    zookeeper:\n        quorum: ['zk-host1', 'zk-host2']\n        path: '/path/in/zookeeper'\n    file:\n        path: '/path/on/disk'\nhbase:\n    namespace: 'schema_namespace'\n    zookeeper_quorum:  ['hbase-zk1-host', 'hbase-zkN-host']\n    hive_imports:\n        tables: ['sometable']\nmysql_failover:\n    pgtid:\n        p_gtid_pattern: $regex_pattern_to_extract_pgtid\n        p_gtid_prefix: $prefix_to_add_to_pgtid_query_used_in_orchestrator_url\n    orchestrator:\n        username: orchestrator-user-name\n        password: orchestrator-password\n        url:      http://orchestrator-host/api\nmetrics:\n    frequency: 10 seconds\n    reporters:\n    # The following are options for metrics reporters,\n    # only one should be used (graphite or console)\n        graphite:\n            namespace: 'graphite.namespace.prefix'\n            url: 'graphite_host[: graphite_port (default is 3002) ]'\n        console:\n            timeZone: UTC\n            output: stdout", 
+            "title": "Configuration file structure"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/", 
+            "text": "HBaseSnapshotter\n\n\nOverview\n\n\nHBaseSnapshotter is a Spark application that takes a snapshot of an HBase table at a given point in time and stores it to a Hive table. Currently there are two solutions doing similar work, but not the exact functionality.\n\n\n\n\n\n\nHBase allows you to take a snapshot from an HBase table to another HBase table by using the provided Export and Import tools. This is done by specifying a table name, start time, end time, and number of versions, and running the export tool which will export the table to HDFS in a SequenceFile format. Then you can import the SequenceFile files to a new HBase table by using the import tool. For more information, you can check \nthis\n.\n\n\n\n\n\n\nHive storage handler allows you to use Hive queries and apply Hive operations on an HBase table. The shortcoming of this method is that it's able to access only the latest version of an HBase table. You can check [this] (https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration) for more information.\n\n\n\n\n\n\nHBaseSnapshotter allows you to take a snapshot from an HBase table and save it as a Hive table directly, with the possibility of selecting a desired point in time to copy the table at.\n\n\nConfiguration\n\n\nHBaseSnapshotter needs a yaml configuration file to be provided through the option \n--config \nCONFIG-PATH\n\n\nThe format of the yaml config is as follows:\n\n\nhbase:\n    zookeeper_quorum:  ['hbase-zk1-host', 'hbase-zkN-host']\n    schema: ['family1:qualifier1', 'familyN:qualifierN']\nhive:\n    default_null: 'DEFAULT NULL VALUE'\n\n\n\n\n\n\nzookeeper_quorum: A list of HBase zookeeper nodes to establish a connection with an HBase table.\n\n\nschema: A list of columns forming the schema of the source HBase table. A column is formatted as   \n'Familyname:Qualifiername'\n.\n\n\ndefault_null: The default value to be inserted in Hive table, if the corresponding column in HBase is missing in a specific row. Since HBase is a key-value store, not all columns need to exist in every row. if \ndefault_null\n is not configured, the default null value will be \"NULL\".\n\n\n\n\nTo write a configuration file, you can start by copying the file config-default.yml and customise it to your own needs.\n\n\nHive Schema\n\n\nThe resulted Hive table will have the same schema as the source HBase table, but the column names will be formatted\nas \n'Familyname_Qualifiername'\n. A new column will be added to the Hive table named \n\"k_hbase_key\"\n for storing the HBase key of this row. For now, the columns in Hive will be of type \nstring\n only, but in the future you might be able to provide the types in the config file.\n\n\nUsage:\n\n\nhbase-snapshotter [options] \nsource table\n \ndest table\n\n\nOptions:\n  --pit \nTIMESTAMP\n\n        Takes a snapshot of the latest HBase version available before the given timestamp (exclusive). If this option is not specified, the latest timestamp will be used.\n  --config \nCONFIG-PATH\n\n        The path of a yaml config file.\n  --help\n        Prints this usage text\n\nArguments:\n  \nsource table\n\n        The source HBase table you are copying from. It should be in the format NAMESPACE:TABLENAME\n  \ndest table\n\n        The destination Hive table you are copying to. It should be in the format DATABASE.TABLENAME\n\n\n\n\nBuild\n\n\nFirst you need to build a fat jar containing all the dependencies needed by this app. Inside the project's folder, execute the command:\n\nsbt assembly\n\nIf you don't have sbt-assembly installed, take a look at this https://github.com/sbt/sbt-assembly. This will build a fat jar at this path:\n\ntarget/scala-2.10/HBaseSnapshotter-assembly-1.0.jar\n\n\nYou can then copy this jar along with the files hbase-snapshotter and config-default.yml to a docker container or a hadoop box supporting Spark:\n\n\n    scp target/scala-2.10/HBaseSnapshotter-assembly-1.0.jar hadoop-box.example.com:~\n    scp hbase-snapshotter hadoop-box.example.com:~\n    scp config-default.yml hadoop-box.example.com:~\n\n\n\n\nReplace hadoop-box.example.com by the actual name of your hadoop box.\n\n\nProvide your config settings in the file config-default.yml, or in a new yaml file.\n\n\nFinally, from the docker or hadoop box, you can run the spark app via the bash script\n\n\n    ~/hbase-snapshotter [options] \nsource table\n \ndest table", 
+            "title": "Snapshotter"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#hbasesnapshotter", 
+            "text": "", 
+            "title": "HBaseSnapshotter"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#overview", 
+            "text": "HBaseSnapshotter is a Spark application that takes a snapshot of an HBase table at a given point in time and stores it to a Hive table. Currently there are two solutions doing similar work, but not the exact functionality.    HBase allows you to take a snapshot from an HBase table to another HBase table by using the provided Export and Import tools. This is done by specifying a table name, start time, end time, and number of versions, and running the export tool which will export the table to HDFS in a SequenceFile format. Then you can import the SequenceFile files to a new HBase table by using the import tool. For more information, you can check  this .    Hive storage handler allows you to use Hive queries and apply Hive operations on an HBase table. The shortcoming of this method is that it's able to access only the latest version of an HBase table. You can check [this] (https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration) for more information.    HBaseSnapshotter allows you to take a snapshot from an HBase table and save it as a Hive table directly, with the possibility of selecting a desired point in time to copy the table at.", 
+            "title": "Overview"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#configuration", 
+            "text": "HBaseSnapshotter needs a yaml configuration file to be provided through the option  --config  CONFIG-PATH  The format of the yaml config is as follows:  hbase:\n    zookeeper_quorum:  ['hbase-zk1-host', 'hbase-zkN-host']\n    schema: ['family1:qualifier1', 'familyN:qualifierN']\nhive:\n    default_null: 'DEFAULT NULL VALUE'   zookeeper_quorum: A list of HBase zookeeper nodes to establish a connection with an HBase table.  schema: A list of columns forming the schema of the source HBase table. A column is formatted as    'Familyname:Qualifiername' .  default_null: The default value to be inserted in Hive table, if the corresponding column in HBase is missing in a specific row. Since HBase is a key-value store, not all columns need to exist in every row. if  default_null  is not configured, the default null value will be \"NULL\".   To write a configuration file, you can start by copying the file config-default.yml and customise it to your own needs.", 
+            "title": "Configuration"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#hive-schema", 
+            "text": "The resulted Hive table will have the same schema as the source HBase table, but the column names will be formatted\nas  'Familyname_Qualifiername' . A new column will be added to the Hive table named  \"k_hbase_key\"  for storing the HBase key of this row. For now, the columns in Hive will be of type  string  only, but in the future you might be able to provide the types in the config file.", 
+            "title": "Hive Schema"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#usage", 
+            "text": "hbase-snapshotter [options]  source table   dest table \n\nOptions:\n  --pit  TIMESTAMP \n        Takes a snapshot of the latest HBase version available before the given timestamp (exclusive). If this option is not specified, the latest timestamp will be used.\n  --config  CONFIG-PATH \n        The path of a yaml config file.\n  --help\n        Prints this usage text\n\nArguments:\n   source table \n        The source HBase table you are copying from. It should be in the format NAMESPACE:TABLENAME\n   dest table \n        The destination Hive table you are copying to. It should be in the format DATABASE.TABLENAME", 
+            "title": "Usage:"
+        }, 
+        {
+            "location": "/user-guide/snapshotter/#build", 
+            "text": "First you need to build a fat jar containing all the dependencies needed by this app. Inside the project's folder, execute the command: sbt assembly \nIf you don't have sbt-assembly installed, take a look at this https://github.com/sbt/sbt-assembly. This will build a fat jar at this path: target/scala-2.10/HBaseSnapshotter-assembly-1.0.jar  You can then copy this jar along with the files hbase-snapshotter and config-default.yml to a docker container or a hadoop box supporting Spark:      scp target/scala-2.10/HBaseSnapshotter-assembly-1.0.jar hadoop-box.example.com:~\n    scp hbase-snapshotter hadoop-box.example.com:~\n    scp config-default.yml hadoop-box.example.com:~  Replace hadoop-box.example.com by the actual name of your hadoop box.  Provide your config settings in the file config-default.yml, or in a new yaml file.  Finally, from the docker or hadoop box, you can run the spark app via the bash script      ~/hbase-snapshotter [options]  source table   dest table", 
+            "title": "Build"
+        }, 
+        {
+            "location": "/user-guide/validator/", 
+            "text": "validator\n\n\nA service for validating replicator correctness.", 
+            "title": "Validator"
+        }, 
+        {
+            "location": "/user-guide/validator/#validator", 
+            "text": "A service for validating replicator correctness.", 
+            "title": "validator"
+        }, 
+        {
+            "location": "/about/", 
+            "text": "Author\n\n\nBosko Devetak \n\n\nContributors\n\n\n\n\nGreg Franklin \ngregf1\n\n\nIslam Hassan \nishassan\n\n\nMikhail Dutikov \nmikhaildutikov\n\n\nPavel Salimov \nchcat\n\n\nPedro Silva \npedros\n\n\nRares Mirica \nmrares\n\n\nRaynald Chung \nraynald\n\n\n\n\nAcknowledgment\n\n\nReplicator was originally developed for Booking.com. With approval from Booking.com, the code and specification were generalized and published as Open Source on github, for which the author would like to express his gratitude.\n\n\nCopyright and Licence\n\n\nCopyright (C) 2015, 2016 by Bosko Devetak\n\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\n\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.", 
+            "title": "About"
+        }, 
+        {
+            "location": "/about/#author", 
+            "text": "Bosko Devetak", 
+            "title": "Author"
+        }, 
+        {
+            "location": "/about/#contributors", 
+            "text": "Greg Franklin  gregf1  Islam Hassan  ishassan  Mikhail Dutikov  mikhaildutikov  Pavel Salimov  chcat  Pedro Silva  pedros  Rares Mirica  mrares  Raynald Chung  raynald", 
+            "title": "Contributors"
+        }, 
+        {
+            "location": "/about/#acknowledgment", 
+            "text": "Replicator was originally developed for Booking.com. With approval from Booking.com, the code and specification were generalized and published as Open Source on github, for which the author would like to express his gratitude.", 
+            "title": "Acknowledgment"
+        }, 
+        {
+            "location": "/about/#copyright-and-licence", 
+            "text": "Copyright (C) 2015, 2016 by Bosko Devetak  Licensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at  http://www.apache.org/licenses/LICENSE-2.0  Unless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.", 
+            "title": "Copyright and Licence"
+        }
+    ]
+}
