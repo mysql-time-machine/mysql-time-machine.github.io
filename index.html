@@ -138,6 +138,7 @@
               
                 <h1 id="welcome-to-mysql-time-machine">Welcome to MySQL Time Machine</h1>
 <p>MySQL Time Machine is a collection of services and tools for creating, processing and storing streams of MySQL data changes. Its main components are listed bellow.</p>
+<p><img alt="reference name" src="./img/MySQL_Time_Machine_Data_Flow.jpg" /></p>
 <h2 id="replicator">Replicator</h2>
 <p>Replicates data changes from MySQL binlog to HBase or Kafka. In case of HBase it preserves the previous data versions. HBase version is intended for auditing of historical data. In addition can maintain special daily-changes tables which are convenient for fast and cheap imports from HBase to Hive. Kafka version is intended for processing data change streams in real time.</p>
 <h2 id="binlog-flusher">Binlog Flusher</h2>
@@ -192,5 +193,5 @@
 
 <!--
 MkDocs version : 0.16.0
-Build Date UTC : 2016-11-16 17:55:55
+Build Date UTC : 2016-11-18 17:09:44
 -->
