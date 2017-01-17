@@ -79,7 +79,7 @@
                 
                     <li><a class="toctree-l4" href="#hive-schema">Hive Schema</a></li>
                 
-                    <li><a class="toctree-l4" href="#usage">Usage:</a></li>
+                    <li><a class="toctree-l4" href="#usage">Usage</a></li>
                 
                     <li><a class="toctree-l4" href="#build">Build</a></li>
                 
@@ -155,57 +155,98 @@
 </ol>
 <p>HBaseSnapshotter allows you to take a snapshot from an HBase table and save it as a Hive table directly, with the possibility of selecting a desired point in time to copy the table at.</p>
 <h3 id="configuration">Configuration</h3>
-<p>HBaseSnapshotter needs a yaml configuration file to be provided through the option <code>--config &lt;CONFIG-PATH&gt;</code></p>
-<p>The format of the yaml config is as follows:</p>
-<pre><code class="YAML">hbase:
-    zookeeper_quorum:  ['hbase-zk1-host', 'hbase-zkN-host']
-    schema: ['family1:qualifier1', 'familyN:qualifierN']
-hive:
-    default_null: 'DEFAULT NULL VALUE'
+<p>HBaseSnapshotter needs a json configuration file to be provided as a positional argument <code>application.json</code></p>
+<p>The format of the json config should obey one the following schemas
+(<code>HBaseSnapshotter.MySQLSchema</code> or <code>HBaseSnapshotter.HBaseSchema</code>):</p>
+<pre><code>HBaseSnapshotter {
+  MySQLSchema {
+    mysql.table : "database.Tablename"
+    mysql.schema : "namespace:tablename"
+    hbase.timestamp : -1
+    hbase.zookeeper_quorum : ["hbase-zk1-host", "hbase-zkN-host"]
+    hbase.table : "namespace:tablename"
+    hive.table : "database.tablename"
+  },
+  HBaseSchema {
+    hbase.timestamp : -1
+    hbase.zookeeper_quorum : ["hbase-zk1-host", "hbase-zkN-host"]
+    hbase.schema : ["family1:qualifier1:type1", "familyN:qualifierN:typeN"]
+    hbase.table : "namespace:tablename"
+    hive.table : "database.tablename"
+  }
+}
 </code></pre>
-
 <ul>
-<li>zookeeper_quorum: A list of HBase zookeeper nodes to establish a connection with an HBase table.</li>
-<li>schema: A list of columns forming the schema of the source HBase table. A column is formatted as   <em>'Familyname:Qualifiername'</em>.</li>
-<li>default_null: The default value to be inserted in Hive table, if the corresponding column in HBase is missing in a specific row. Since HBase is a key-value store, not all columns need to exist in every row. if <em>default_null</em> is not configured, the default null value will be "NULL".</li>
+<li><code>mysql.table</code>: original replicated MySQL table (<code>string</code>)</li>
+<li><code>mysql.schema</code>: schema change history table in HBase (<code>string</code>)</li>
+<li><code>hbase.timestamp</code>: time before which to snapshot (<code>number</code>)</li>
+<li><code>hbase.zookeeper_quorum</code>: list of HBase zookeeper nodes to establish a connection with an HBase table (<code>list</code>)</li>
+<li><code>hbase.table</code>: replicated table in HBase (<code>string</code>)</li>
+<li><code>hbase.schema</code>: list of columns forming the schema of the source HBase table. A column is formatted as <code>Familyname:Qualifiername:Typename</code> (<code>list</code>)</li>
+<li><code>hive.table</code>: destination table for snapshot in Hive (<code>string</code>)</li>
 </ul>
-<p>To write a configuration file, you can start by copying the file config-default.yml and customise it to your own needs.</p>
+<p>For snapshots from MySQL replication chains produced by the <a href="https://github.com/mysql-time-machine/replicator">Replicator</a>, the following is a valid configuration:</p>
+<pre><code>{
+    "mysql": {
+        "table": "database.Tablename",
+        "schema": "schema_history:database"
+    },
+    "hbase": {
+        "timestamp": -1,
+        "zookeeper_quorum": ["hbase-zk1-host", "hbase-zkN-host"],
+        "table": "namespace:tablename"
+    },
+    "hive": {
+        "table": "database.tablename"
+    }
+}
+</code></pre>
+<p>For snapshots from arbitrary HBase tables, the following is a valid configuration:</p>
+<pre><code>{
+    "hbase": {
+        "timestamp": -1,
+        "zookeeper_quorum": ["hbase-zk1-host", "hbase-zkN-host"],
+        "schema": ["d:column_a:integer",
+                   "d:column_b:string",
+                   "d:column_c:double"],
+        "table": "namespace:tablename:"
+    },
+    "hive": {
+        "table": "database.tablename"
+    }
+}
+</code></pre>
+<p>To write a configuration file, you can start by copying one of the
+example files in the <code>conf</code> directory and customise it to your own
+needs.</p>
 <h3 id="hive-schema">Hive Schema</h3>
-<p>The resulted Hive table will have the same schema as the source HBase table, but the column names will be formatted
-as <em>'Familyname_Qualifiername'</em>. A new column will be added to the Hive table named <em>"k_hbase_key"</em> for storing the HBase key of this row. For now, the columns in Hive will be of type <em>string</em> only, but in the future you might be able to provide the types in the config file.</p>
-<h3 id="usage">Usage:</h3>
-<pre><code>hbase-snapshotter [options] &lt;source table&gt; &lt;dest table&gt;
-
-Options:
-  --pit &lt;TIMESTAMP&gt;
-        Takes a snapshot of the latest HBase version available before the given timestamp (exclusive). If this option is not specified, the latest timestamp will be used.
-  --config &lt;CONFIG-PATH&gt;
-        The path of a yaml config file.
-  --help
-        Prints this usage text
-
-Arguments:
-  &lt;source table&gt;
-        The source HBase table you are copying from. It should be in the format NAMESPACE:TABLENAME
-  &lt;dest table&gt;
-        The destination Hive table you are copying to. It should be in the format DATABASE.TABLENAME
+<p>The resulting Hive table will have the same schema as the source HBase
+table (as far as it can infer the original MySQL schema, or as
+completely as possible given the <code>hbase.schema</code> list. Missing
+datatypes will default to <code>STRING</code>.  A new column will be added to the
+Hive table named <code>k_hbase_row_key</code> for storing the HBase key of this
+row. For MySQL snapshots, an additional row named
+<code>k_replicator_row_status</code> will be added to the Hive table, denoting
+whether the row resulted from a schema change.</p>
+<h3 id="usage">Usage</h3>
+<pre><code>bin/hbase-snapshotter application.conf
 </code></pre>
-
 <h3 id="build">Build</h3>
-<p>First you need to build a fat jar containing all the dependencies needed by this app. Inside the project's folder, execute the command:
-<code>sbt assembly</code>
-If you don't have sbt-assembly installed, take a look at this https://github.com/sbt/sbt-assembly. This will build a fat jar at this path:
-<code>target/scala-2.10/HBaseSnapshotter-assembly-1.0.jar</code></p>
-<p>You can then copy this jar along with the files hbase-snapshotter and config-default.yml to a docker container or a hadoop box supporting Spark:</p>
-<pre><code>    scp target/scala-2.10/HBaseSnapshotter-assembly-1.0.jar hadoop-box.example.com:~
-    scp hbase-snapshotter hadoop-box.example.com:~
-    scp config-default.yml hadoop-box.example.com:~
+<p>First you need to build a fat jar containing all the dependencies needed by this app. Inside the project's folder, execute the command:</p>
+<pre><code>sbt assembly
 </code></pre>
-
+<p>If you don't have sbt-assembly installed, take a look at this https://github.com/sbt/sbt-assembly. This will build a fat jar at this path:</p>
+<pre><code>target/scala-2.10/HBaseSnapshotter-assembly-2.0.jar
+</code></pre>
+<p>You can then copy this jar along with the files hbase-snapshotter and application.json to a docker container or a hadoop box supporting Spark:</p>
+<pre><code>scp target/scala-2.10/HBaseSnapshotter-assembly-2.0.jar hadoop-box.example.com:~
+scp hbase-snapshotter hadoop-box.example.com:~
+scp application.json hadoop-box.example.com:~
+</code></pre>
 <p>Replace hadoop-box.example.com by the actual name of your hadoop box.</p>
-<p>Provide your config settings in the file config-default.yml, or in a new yaml file.</p>
+<p>Provide your config settings in the file <code>application.json</code>.</p>
 <p>Finally, from the docker or hadoop box, you can run the spark app via the bash script</p>
-<pre><code>    ~/hbase-snapshotter [options] &lt;source table&gt; &lt;dest table&gt;
+<pre><code>bin/hbase-snapshotter application.json
 </code></pre>
               
             </div>
