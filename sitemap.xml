@@ -4,7 +4,7 @@
     
     <url>
      <loc>/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,26 +12,26 @@
     
         
     <url>
-     <loc>/user-guide/replicator/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <loc>/replicator/</loc>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>/user-guide/binlog-flusher/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <loc>/snapshotter/</loc>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>/user-guide/snapshotter/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <loc>/validator/</loc>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>/user-guide/validator/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <loc>/failover_options/</loc>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
@@ -40,7 +40,7 @@
     
     <url>
      <loc>/about/</loc>
-     <lastmod>2017-02-21</lastmod>
+     <lastmod>2017-05-15</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
