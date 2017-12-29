@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Hadoop/Hive Imports - MySQL Time Machine</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Hadoop/Hive Imports";
+    var mkdocs_page_input_path = "snapshotter.md";
+    var mkdocs_page_url = "/snapshotter/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> MySQL Time Machine</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Overivew</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">User Guide</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../binlog_flusher/">Binlog Flusher</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../active_schema/">Active Schema</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../replicator/">Running the Replicator</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Hadoop/Hive Imports</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#overview">Overview</a></li>
+    
+
+    <li class="toctree-l3"><a href="#configuration">Configuration</a></li>
+    
+
+    <li class="toctree-l3"><a href="#hive_schema">Hive Schema</a></li>
+    
+
+    <li class="toctree-l3"><a href="#usage">Usage</a></li>
+    
+
+    <li class="toctree-l3"><a href="#build">Build</a></li>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../validator/">Setting up the Validator</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../failover_options/">Failover Options</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../about/">About</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">MySQL Time Machine</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>User Guide &raquo;</li>
+        
+      
+    
+    <li>Hadoop/Hive Imports</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>HBaseSnapshotter is a Spark application that takes a snapshot of an HBase table at a given point in time and stores it to a Hive table.</p>
+<p><img alt="data flow" src="../img/HBaseSnapshotter.png" /></p>
+<p>Currently there are two other solutions doing similar work, but not the exact functionality.</p>
+<ol>
+<li>
+<p>HBase allows you to take a snapshot from an HBase table to another HBase table by using the provided Export and Import tools. This is done by specifying a table name, start time, end time, and number of versions, and running the export tool which will export the table to HDFS in a SequenceFile format. Then you can import the SequenceFile files to a new HBase table by using the import tool. For more information, you can check <a href="http://hbase.apache.org/book.html#export">this</a>.</p>
+</li>
+<li>
+<p>Hive storage handler allows you to use Hive queries and apply Hive operations on an HBase table. The shortcoming of this method is that it&rsquo;s able to access only the latest version of an HBase table. You can check [this] (https://cwiki.apache.org/confluence/display/Hive/HBaseIntegration) for more information.</p>
+</li>
+</ol>
+<p>HBaseSnapshotter allows you to take a snapshot from an HBase table and save it as a Hive table directly, with the possibility of selecting a desired point in time to copy the table at.</p>
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<p>HBaseSnapshotter needs a json configuration file to be provided as a positional argument <code>application.json</code></p>
+<p>The format of the json config should obey one the following schemas
+(<code>HBaseSnapshotter.MySQLSchema</code> or <code>HBaseSnapshotter.HBaseSchema</code>):</p>
+<pre><code>HBaseSnapshotter {
+  MySQLSchema {
+    mysql.table : "database.Tablename"
+    mysql.schema : "namespace:tablename"
+    hbase.timestamp : -1
+    hbase.zookeeper_quorum : ["hbase-zk1-host", "hbase-zkN-host"]
+    hbase.table : "namespace:tablename"
+    hive.table : "database.tablename"
+  },
+  HBaseSchema {
+    hbase.timestamp : -1
+    hbase.zookeeper_quorum : ["hbase-zk1-host", "hbase-zkN-host"]
+    hbase.schema : ["family1:qualifier1:type1", "familyN:qualifierN:typeN"]
+    hbase.table : "namespace:tablename"
+    hive.table : "database.tablename"
+  }
+}
+</code></pre>
+<ul>
+<li><code>mysql.table</code>: original replicated MySQL table (<code>string</code>)</li>
+<li><code>mysql.schema</code>: schema change history table in HBase (<code>string</code>)</li>
+<li><code>hbase.timestamp</code>: time before which to snapshot (<code>number</code>)</li>
+<li><code>hbase.zookeeper_quorum</code>: list of HBase zookeeper nodes to establish a connection with an HBase table (<code>list</code>)</li>
+<li><code>hbase.table</code>: replicated table in HBase (<code>string</code>)</li>
+<li><code>hbase.schema</code>: list of columns forming the schema of the source HBase table. A column is formatted as <code>Familyname:Qualifiername:Typename</code> (<code>list</code>)</li>
+<li><code>hive.table</code>: destination table for snapshot in Hive (<code>string</code>)</li>
+</ul>
+<p>For snapshots from MySQL replication chains produced by the <a href="https://github.com/mysql-time-machine/replicator">Replicator</a>, the following is a valid configuration:</p>
+<pre><code>{
+    "mysql": {
+        "table": "database.Tablename",
+        "schema": "schema_history:database"
+    },
+    "hbase": {
+        "timestamp": -1,
+        "zookeeper_quorum": ["hbase-zk1-host", "hbase-zkN-host"],
+        "table": "namespace:tablename"
+    },
+    "hive": {
+        "table": "database.tablename"
+    }
+}
+</code></pre>
+<p>For snapshots from arbitrary HBase tables, the following is a valid configuration:</p>
+<pre><code>{
+    "hbase": {
+        "timestamp": -1,
+        "zookeeper_quorum": ["hbase-zk1-host", "hbase-zkN-host"],
+        "schema": ["d:column_a:integer",
+                   "d:column_b:string",
+                   "d:column_c:double"],
+        "table": "namespace:tablename:"
+    },
+    "hive": {
+        "table": "database.tablename"
+    }
+}
+</code></pre>
+<p>To write a configuration file, you can start by copying one of the
+example files in the <code>conf</code> directory and customise it to your own
+needs.</p>
+<h3 id="hive_schema">Hive Schema<a class="headerlink" href="#hive_schema" title="Permanent link">&para;</a></h3>
+<p>The resulting Hive table will have the same schema as the source HBase
+table (as far as it can infer the original MySQL schema, or as
+completely as possible given the <code>hbase.schema</code> list. Missing
+datatypes will default to <code>STRING</code>.  A new column will be added to the
+Hive table named <code>k_hbase_row_key</code> for storing the HBase key of this
+row. For MySQL snapshots, an additional row named
+<code>k_replicator_row_status</code> will be added to the Hive table, denoting
+whether the row resulted from a schema change.</p>
+<h3 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h3>
+<pre><code>bin/hbase-snapshotter application.conf
+</code></pre>
+<h3 id="build">Build<a class="headerlink" href="#build" title="Permanent link">&para;</a></h3>
+<p>First you need to build a fat jar containing all the dependencies needed by this app. Inside the project&rsquo;s folder, execute the command:</p>
+<pre><code>sbt assembly
+</code></pre>
+<p>If you don&rsquo;t have sbt-assembly installed, take a look at this https://github.com/sbt/sbt-assembly. This will build a fat jar at this path:</p>
+<pre><code>target/scala-2.10/HBaseSnapshotter-assembly-2.0.jar
+</code></pre>
+<p>You can then copy this jar along with the files hbase-snapshotter and application.json to a docker container or a hadoop box supporting Spark:</p>
+<pre><code>scp target/scala-2.10/HBaseSnapshotter-assembly-2.0.jar hadoop-box.example.com:~
+scp hbase-snapshotter hadoop-box.example.com:~
+scp application.json hadoop-box.example.com:~
+</code></pre>
+<p>Replace hadoop-box.example.com by the actual name of your hadoop box.</p>
+<p>Provide your config settings in the file <code>application.json</code>.</p>
+<p>Finally, from the docker or hadoop box, you can run the spark app via the bash script</p>
+<pre><code>bin/hbase-snapshotter application.json
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../validator/" class="btn btn-neutral float-right" title="Setting up the Validator">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../replicator/" class="btn btn-neutral" title="Running the Replicator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../replicator/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../validator/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
