@@ -1,4 +1,4 @@
-# Welcome to MySQL Time Machine
+## Overview
 MySQL Time Machine is a collection of services and tools for creating, processing and storing streams of MySQL data changes. Its main components are presented bellow.
 ![data flow](img/mysql_time_machine_data_flow.png)
 

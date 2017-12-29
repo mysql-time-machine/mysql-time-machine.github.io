@@ -2,13 +2,18 @@
 [Bosko Devetak](https://github.com/bdevetak)
 
 # Contributors
+* [Carlos Tasada](https://github.com/raynald)
+* [Dmitrii Tcyganov](https://github.com/dtcyganov)
+* [Evgeny Dmitriev](https://github.com/dmitrieveu)
 * [Greg Franklin](https://github.com/gregf1)
 * [Islam Hassan](https://github.com/ishassan)
 * [Mikhail Dutikov](https://github.com/mikhaildutikov)
+* [Muhammad Abbady](https://github.com/muhammad-abbady)
+* [Philippe Bruhat (BooK)](https://github.com/book)
 * [Pavel Salimov](https://github.com/chcat)
 * [Pedro Silva](https://github.com/pedros)
-* [Rares Mirica](https://github.com/mrares)
 * [Raynald Chung](https://github.com/raynald)
+* [Rares Mirica](https://github.com/mrares)
 
 # Acknowledgment
 Replicator was originally developed for Booking.com. With approval from Booking.com, the code and specification were generalized and published as Open Source on github, for which the author would like to express his gratitude.

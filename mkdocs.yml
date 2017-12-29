@@ -1,14 +1,15 @@
 site_name: MySQL Time Machine
 
 pages:
-    - Overivew: index.md
+    - MySQL Time Machine: index.md
     - User Guide:
         - Binlog Flusher: 'binlog_flusher.md'
         - Active Schema: 'active_schema.md'
         - Running the Replicator: 'replicator.md'
+        - Transaction Support: 'transactions.md'
+        - Failover Options: 'failover_options.md'
         - Hadoop/Hive Imports: 'snapshotter.md'
         - Setting up the Validator: 'validator.md'
-        - Failover Options: 'failover_options.md'
     - About: about.md
 theme: readthedocs
 markdown_extensions:
