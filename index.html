@@ -8,7 +8,7 @@
   <meta name="description" content="None">
   
   <link rel="shortcut icon" href="./img/favicon.ico">
-  <title>Overivew - MySQL Time Machine</title>
+  <title>MySQL Time Machine - MySQL Time Machine</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="./css/theme.css" type="text/css" />
@@ -17,7 +17,7 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Overivew";
+    var mkdocs_page_name = "MySQL Time Machine";
     var mkdocs_page_input_path = "index.md";
     var mkdocs_page_url = "/";
   </script>
@@ -49,22 +49,22 @@
           
             <li class="toctree-l1 current">
 		
-    <a class="current" href=".">Overivew</a>
+    <a class="current" href=".">MySQL Time Machine</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#welcome_to_mysql_time_machine">Welcome to MySQL Time Machine</a></li>
+    <li class="toctree-l2"><a href="#overview">Overview</a></li>
     
-        <ul>
-        
-            <li><a class="toctree-l3" href="#replicator">Replicator</a></li>
-        
-            <li><a class="toctree-l3" href="#binlog_flusher">Binlog Flusher</a></li>
-        
-            <li><a class="toctree-l3" href="#hbase_snapshotter">HBase Snapshotter</a></li>
-        
-            <li><a class="toctree-l3" href="#validator">Validator</a></li>
-        
-        </ul>
+
+    <li class="toctree-l2"><a href="#replicator">Replicator</a></li>
+    
+
+    <li class="toctree-l2"><a href="#binlog_flusher">Binlog Flusher</a></li>
+    
+
+    <li class="toctree-l2"><a href="#hbase_snapshotter">HBase Snapshotter</a></li>
+    
+
+    <li class="toctree-l2"><a href="#validator">Validator</a></li>
     
 
     </ul>
@@ -88,15 +88,19 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="transactions/">Transaction Support</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="failover_options/">Failover Options</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="snapshotter/">Hadoop/Hive Imports</a>
                 </li>
                 <li class="">
                     
     <a class="" href="validator/">Setting up the Validator</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="failover_options/">Failover Options</a>
                 </li>
     </ul>
 	    </li>
@@ -128,7 +132,7 @@
     
       
     
-    <li>Overivew</li>
+    <li>MySQL Time Machine</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -138,7 +142,7 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="welcome_to_mysql_time_machine">Welcome to MySQL Time Machine<a class="headerlink" href="#welcome_to_mysql_time_machine" title="Permanent link">&para;</a></h1>
+                <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>MySQL Time Machine is a collection of services and tools for creating, processing and storing streams of MySQL data changes. Its main components are presented bellow.
 <img alt="data flow" src="./img/mysql_time_machine_data_flow.png" /></p>
 <h2 id="replicator">Replicator<a class="headerlink" href="#replicator" title="Permanent link">&para;</a></h2>
@@ -218,5 +222,5 @@ is not present in binlog TABLE_MAP event (like if the number is unsigned). This 
 
 <!--
 MkDocs version : 0.16.3
-Build Date UTC : 2017-12-29 17:09:53
+Build Date UTC : 2017-12-29 20:43:42
 -->

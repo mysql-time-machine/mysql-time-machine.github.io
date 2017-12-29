@@ -49,7 +49,7 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="..">Overivew</a>
+    <a class="" href="..">MySQL Time Machine</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -70,29 +70,40 @@
                 </li>
                 <li class="">
                     
-    <a class="" href="../snapshotter/">Hadoop/Hive Imports</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../validator/">Setting up the Validator</a>
+    <a class="" href="../transactions/">Transaction Support</a>
                 </li>
                 <li class=" current">
                     
     <a class="current" href="./">Failover Options</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#failover_options">Failover Options</a></li>
+    <li class="toctree-l3"><a href="#overview">Overview</a></li>
     
-        <ul>
-        
-            <li><a class="toctree-l4" href="#mysql_failover_with_pgtid">MySQL failover with pGTID</a></li>
-        
-            <li><a class="toctree-l4" href="#replicator_failover_with_zookeeper_safe_checkpoints">Replicator failover with zookeeper safe checkpoints</a></li>
-        
-        </ul>
+
+    <li class="toctree-l3"><a href="#pseudo_gtids">Pseudo GTIDs</a></li>
+    
+
+    <li class="toctree-l3"><a href="#safe_checkpoints">Safe Checkpoints</a></li>
+    
+
+    <li class="toctree-l3"><a href="#replicator_failover">Replicator Failover</a></li>
+    
+
+    <li class="toctree-l3"><a href="#mysql_failover_with_pgtid">MySQL failover with pGTID</a></li>
+    
+
+    <li class="toctree-l3"><a href="#known_limitations">Known Limitations</a></li>
     
 
     </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../snapshotter/">Hadoop/Hive Imports</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../validator/">Setting up the Validator</a>
                 </li>
     </ul>
 	    </li>
@@ -138,14 +149,37 @@
           <div role="main">
             <div class="section">
               
-                <h2 id="failover_options">Failover Options<a class="headerlink" href="#failover_options" title="Permanent link">&para;</a></h2>
-<h3 id="mysql_failover_with_pgtid">MySQL failover with pGTID<a class="headerlink" href="#mysql_failover_with_pgtid" title="Permanent link">&para;</a></h3>
-<pre><code>    Documentation on the way.
+                <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
+<p>There are two types of failover that are suported:</p>
+<ul>
+<li>Replicator failover</li>
+<li>MySQL failover</li>
+</ul>
+<p>Both types are based on pseudo GTIDs.</p>
+<h3 id="pseudo_gtids">Pseudo GTIDs<a class="headerlink" href="#pseudo_gtids" title="Permanent link">&para;</a></h3>
+<p>Pseudo GTIDs are implemented as a <code>NoOp</code> statements that happen every 5 seconds on MySQL master.
+Each pseudo GTID statement goes to the binlog and contains a unique id. The statements are of the form:</p>
+<pre><code class="sql">drop view if exists `pgtid_meta`.`_pseudo_gtid_hint__asc:5B01A7FA:ECBC11E7B0CC218F:A8312C70`
 </code></pre>
 
-<h3 id="replicator_failover_with_zookeeper_safe_checkpoints">Replicator failover with zookeeper safe checkpoints<a class="headerlink" href="#replicator_failover_with_zookeeper_safe_checkpoints" title="Permanent link">&para;</a></h3>
-<pre><code>    Documentation on the way.
-</code></pre>
+<p>In addition, these unique ids have a property of being ascending so given two Pseudo GTIDs we can always know which one originated before the other.</p>
+<p>The script to create these events is given at <a href="https://github.com/mysql-time-machine/mysql-scripts/blob/master/pseudo_gtid.sql">pseudo_gtid</a></p>
+<h3 id="safe_checkpoints">Safe Checkpoints<a class="headerlink" href="#safe_checkpoints" title="Permanent link">&para;</a></h3>
+<p>Replicator will keep track of pseudo GTIDs and as soon as all rows that precede a given pseudoGTID are successfully committed, replicator will
+store that pGTID as a safe checkpoint in zookeeper.</p>
+<h3 id="replicator_failover">Replicator Failover<a class="headerlink" href="#replicator_failover" title="Permanent link">&para;</a></h3>
+<p>There are two ways to setup replicator HA.</p>
+<ol>
+<li>Deploy the replicator as a single container in an orchestrated environments such as Marathon or Kubernetes. These orchestrators can restart it if it crushes.</li>
+<li>Run two instances of the replicator at the same time, where one is the leader and the other can become the leader if the first one dies.</li>
+<li>Combine (1) and (2) for maximum high availability.</li>
+</ol>
+<p>Once the replicator is started/restarted it will make sure to acquire leadership lock in zookeeper and to continue replication from the last safe check point. In case multiple replicators are started only one will acquire the leadership lock and the other instances will wait until the leader dies (in which case one of them will become the new leader and continue the replication from the last safe check point)</p>
+<h3 id="mysql_failover_with_pgtid">MySQL failover with pGTID<a class="headerlink" href="#mysql_failover_with_pgtid" title="Permanent link">&para;</a></h3>
+<p>In case MySQL dies, replicator will die too, and then the standard replicator failover applies. Since the new MySQL slave will be different (with different binlog file names and positions corresponding to the same events) pGTID is used to find
+the right binlog filename and position to continue from.</p>
+<h3 id="known_limitations">Known Limitations<a class="headerlink" href="#known_limitations" title="Permanent link">&para;</a></h3>
+<p>In case of MySQL failover, Kafka applier can end up with up to 5 seconds of duplicate rows. Hbase does not have this limitation since the initial batch of duplicate rows will override the same versions in HBase.</p>
               
             </div>
           </div>
@@ -153,10 +187,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../snapshotter/" class="btn btn-neutral float-right" title="Hadoop/Hive Imports">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../validator/" class="btn btn-neutral" title="Setting up the Validator"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../transactions/" class="btn btn-neutral" title="Transaction Support"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -182,10 +216,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../validator/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../transactions/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../about/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../snapshotter/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
